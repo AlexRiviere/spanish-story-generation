@@ -1,4 +1,5 @@
 import os
+import random
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, UploadFile
@@ -80,14 +81,16 @@ def generate():
 
     client = get_openai_client()
 
-    query = " ".join(profile.grammar_focus + profile.interests)
+    chosen_interest = random.choice(profile.interests) if profile.interests else None
+    query_terms = profile.grammar_focus + ([chosen_interest] if chosen_interest else [])
+    query = " ".join(query_terms)
     note_chunks = embeddings.query_notes(client, query, n_results=5) if query.strip() else []
 
     try:
         result = generator.generate_story(
             client,
             level=profile.level,
-            interests=profile.interests,
+            interest=chosen_interest,
             grammar_focus=profile.grammar_focus,
             note_chunks=note_chunks,
         )

@@ -1,6 +1,77 @@
-vocab
-- Emotions and Personalityel orgullo (pride) impacientarse (to get impatient) desear (to wish / to desire) agradecido (grateful) la confianza (confidence / trust) la timidez (shyness) Work and Daily Life el éxito (success) el ensayo (rehearsal / practice) la pantalla (screen) el plazo (deadline) la reunión (meeting) emplear (to employ / to use) Actions and Movement acercarse (to approach / to go near) sacudir (to shake) meter (to put / to insert) poseer (to possess / to own) lograr (to achieve / to attain) recoger (to pick up / to gather) Connectors and Phrasesal fin y al cabo (after all) a pesar de todo (in spite of everything) a partir de (as of / starting from) a toda prisa (very quickly / in a rush) sin novedad (without incident / nothing new)
+Vocabulario de cocina
 
-grammar 
-- needs to work on por vs para 
-- needs help on forming questions
+sartén - frying pan
+olla - pot
+cuchara de madera - wooden spoon
+hervir - to boil
+sofreír - to sauté
+picar - to chop
+receta - recipe
+sabroso - tasty
+sazonar - to season
+a fuego lento - on low heat
+ingrediente - ingredient
+horno - oven
+
+Frases de cocina - pretérito e imperfecto
+
+"Ayer cociné una sopa de verduras para toda la familia."
+"Cuando era niño, mi abuela cocinaba todos los domingos."
+"Estaba preparando la cena cuando se me quemó el arroz."
+"Si tuviera más tiempo, cocinaría platos más elaborados."
+
+---
+
+Vocabulario de fútbol
+
+el balón - the ball
+el árbitro - the referee
+marcar un gol - to score a goal
+el entrenador - the coach
+la cancha - the field
+el equipo - the team
+empatar - to tie (a game)
+lesionarse - to get injured
+el silbato - the whistle
+la portería - the goal (structure)
+
+Frases de fútbol - pretérito e imperfecto
+
+"Ayer jugué al fútbol con mis amigos en el parque."
+"Cuando era niño, jugaba al fútbol todos los fines de semana."
+"El equipo estaba ganando cuando el árbitro pitó una falta."
+"Si entrenara más, jugaría en un equipo profesional."
+
+---
+
+Vocabulario de música
+
+la guitarra - the guitar
+el ritmo - the rhythm
+ensayar - to rehearse
+la letra - the lyrics
+afinar - to tune (an instrument)
+el escenario - the stage
+grabar - to record
+el álbum - the album
+el concierto - the concert
+componer - to compose
+
+Frases de música - pretérito e imperfecto
+
+"Ayer grabé una canción nueva en mi casa."
+"Cuando era joven, tocaba la guitarra todas las noches."
+"Estaba ensayando cuando se rompió una cuerda de la guitarra."
+"Si practicara más, tocaría mejor el piano."
+
+---
+
+Notas de gramática generales
+
+Pretérito: acción completa, un momento específico en el pasado.
+Imperfecto: acción habitual o descripción en el pasado.
+Cuando se combinan: imperfecto para la acción en progreso, pretérito para
+la acción que la interrumpe.
+
+Subjuntivo en oraciones condicionales (si + imperfecto de subjuntivo, +
+condicional): expresa situaciones hipotéticas o poco probables.

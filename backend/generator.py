@@ -1,5 +1,4 @@
 import json
-import random
 
 from openai import OpenAI
 from pydantic import BaseModel
@@ -70,8 +69,8 @@ RESPONSE_SCHEMA = {
 }
 
 
-def build_prompt(level: str, interests: list[str], grammar_focus: list[str], note_chunks: list[str]) -> str:
-    interest = random.choice(interests) if interests else "temas generales"
+def build_prompt(level: str, interest: str | None, grammar_focus: list[str], note_chunks: list[str]) -> str:
+    interest_text = interest if interest else "temas generales"
     grammar_str = ", ".join(grammar_focus) if grammar_focus else "gramática general"
 
     notes_section = ""
@@ -91,7 +90,7 @@ Escribe una historia en español de entre 200 y 300 palabras para un estudiante 
 Requisitos:
 - El nivel de vocabulario y complejidad gramatical debe corresponder al nivel {level}.
 - Incorpora de forma natural los siguientes puntos gramaticales: {grammar_str}.
-- El tema o ambientación de la historia debe reflejar este interés: {interest}.
+- El tema o ambientación de la historia debe reflejar este interés: {interest_text}.
 {notes_section}
 Después de la historia, genera exactamente 5 preguntas de comprensión de lectura en español, \
 cada una con 4 opciones (a, b, c, d) y un campo correct_answer que indique la opción correcta \
@@ -101,11 +100,11 @@ cada una con 4 opciones (a, b, c, d) y un campo correct_answer que indique la op
 def generate_story(
     client: OpenAI,
     level: str,
-    interests: list[str],
+    interest: str | None,
     grammar_focus: list[str],
     note_chunks: list[str],
 ) -> StoryResponse:
-    prompt = build_prompt(level, interests, grammar_focus, note_chunks)
+    prompt = build_prompt(level, interest, grammar_focus, note_chunks)
 
     completion = client.chat.completions.create(
         model=MODEL,
