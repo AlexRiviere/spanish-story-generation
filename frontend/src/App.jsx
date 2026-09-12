@@ -10,6 +10,7 @@ export default function App() {
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [notesWarning, setNotesWarning] = useState(null);
 
   useEffect(() => {
     loadAll();
@@ -32,9 +33,10 @@ export default function App() {
     }
   }
 
-  function handleProfileSaved(savedProfile) {
+  function handleProfileSaved(savedProfile, warning) {
     setProfile(savedProfile);
     setEditing(false);
+    setNotesWarning(warning || null);
     getNotesStatus()
       .then((data) => setChunkCount(data.chunk_count))
       .catch(() => {});
@@ -59,7 +61,15 @@ export default function App() {
         {loading && <p className="text-gray-500">Loading...</p>}
 
         {!loading && error && (
-          <p className="text-sm text-red-600">{error}</p>
+          <div className="bg-red-50 border border-red-200 rounded-md p-4 flex items-center justify-between gap-4">
+            <p className="text-sm text-red-700">{error}</p>
+            <button
+              onClick={loadAll}
+              className="text-sm font-medium text-red-700 underline whitespace-nowrap"
+            >
+              Retry
+            </button>
+          </div>
         )}
 
         {!loading && (!profile || editing) && (
@@ -76,6 +86,8 @@ export default function App() {
             chunkCount={chunkCount}
             onEdit={() => setEditing(true)}
             onNotesCleared={handleNotesCleared}
+            warning={notesWarning}
+            onDismissWarning={() => setNotesWarning(null)}
           />
         )}
 

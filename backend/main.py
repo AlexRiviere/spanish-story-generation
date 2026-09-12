@@ -4,7 +4,13 @@ import random
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from openai import OpenAI
+from openai import (
+    APIConnectionError,
+    AuthenticationError,
+    OpenAI,
+    OpenAIError,
+    RateLimitError,
+)
 
 import embeddings
 import generator
@@ -31,9 +37,37 @@ def get_openai_client() -> OpenAI:
     if _openai_client is None:
         api_key = os.environ.get("OPENAI_API_KEY")
         if not api_key:
-            raise HTTPException(status_code=500, detail="OPENAI_API_KEY is not set")
+            raise HTTPException(
+                status_code=500,
+                detail=(
+                    "No OpenAI API key is configured. Add OPENAI_API_KEY to "
+                    "backend/.env, then restart the backend server."
+                ),
+            )
         _openai_client = OpenAI(api_key=api_key)
     return _openai_client
+
+
+def openai_error_detail(exc: Exception) -> str:
+    if isinstance(exc, AuthenticationError):
+        return (
+            "OpenAI rejected the configured API key. Check that "
+            "OPENAI_API_KEY in backend/.env is correct, then restart the "
+            "backend server."
+        )
+    if isinstance(exc, RateLimitError):
+        return (
+            "OpenAI rate limit or quota exceeded. Check your OpenAI account "
+            "usage/billing, then try again in a moment."
+        )
+    if isinstance(exc, APIConnectionError):
+        return (
+            "Could not reach the OpenAI API. Check your internet connection "
+            "and try again."
+        )
+    if isinstance(exc, OpenAIError):
+        return f"OpenAI API error: {exc}"
+    return f"Unexpected error: {exc}"
 
 
 @app.get("/profile")
@@ -53,17 +87,43 @@ def notes_status():
 
 @app.post("/notes")
 async def upload_notes(file: UploadFile):
-    if not file.filename.endswith(".txt"):
-        raise HTTPException(status_code=400, detail="Only .txt files are accepted")
+    if not file.filename or not file.filename.lower().endswith(".txt"):
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f'"{file.filename or "unnamed file"}" is not a .txt file. '
+                "Please upload a plain text (.txt) file."
+            ),
+        )
 
     raw = await file.read()
+    if not raw:
+        raise HTTPException(
+            status_code=400,
+            detail=f'"{file.filename}" is empty. Please upload a file that contains text.',
+        )
     try:
         text = raw.decode("utf-8")
     except UnicodeDecodeError:
-        raise HTTPException(status_code=400, detail="File must be UTF-8 encoded text")
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f'"{file.filename}" could not be read as UTF-8 text. Please '
+                "save the file with UTF-8 encoding and try again."
+            ),
+        )
+
+    if not text.strip():
+        raise HTTPException(
+            status_code=400,
+            detail=f'"{file.filename}" doesn\'t contain any readable text.',
+        )
 
     client = get_openai_client()
-    added = embeddings.add_notes(client, text)
+    try:
+        added = embeddings.add_notes(client, text)
+    except OpenAIError as exc:
+        raise HTTPException(status_code=502, detail=openai_error_detail(exc))
     return {"chunks_added": added, "total_chunks": embeddings.get_chunk_count()}
 
 
@@ -84,9 +144,11 @@ def generate():
     chosen_interest = random.choice(profile.interests) if profile.interests else None
     query_terms = profile.grammar_focus + ([chosen_interest] if chosen_interest else [])
     query = " ".join(query_terms)
-    note_chunks = embeddings.query_notes(client, query, n_results=5) if query.strip() else []
 
     try:
+        note_chunks = (
+            embeddings.query_notes(client, query, n_results=5) if query.strip() else []
+        )
         result = generator.generate_story(
             client,
             level=profile.level,
@@ -94,7 +156,12 @@ def generate():
             grammar_focus=profile.grammar_focus,
             note_chunks=note_chunks,
         )
+    except OpenAIError as exc:
+        raise HTTPException(status_code=502, detail=openai_error_detail(exc))
     except Exception as exc:
-        raise HTTPException(status_code=502, detail=f"Story generation failed: {exc}")
+        raise HTTPException(
+            status_code=502,
+            detail=f"Story generation failed unexpectedly: {exc}",
+        )
 
     return result

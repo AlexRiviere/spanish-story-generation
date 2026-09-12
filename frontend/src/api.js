@@ -1,54 +1,73 @@
 const BASE_URL = "http://localhost:8000";
 
+function extractDetail(data, fallback) {
+  const detail = data?.detail;
+  if (!detail) return fallback;
+  if (typeof detail === "string") return detail;
+  // FastAPI/Pydantic validation errors come back as a list of {msg, loc} objects.
+  if (Array.isArray(detail)) {
+    return detail
+      .map((d) => (typeof d === "string" ? d : d.msg || JSON.stringify(d)))
+      .join("; ");
+  }
+  return fallback;
+}
+
 async function handleResponse(res) {
   if (!res.ok) {
-    let detail = res.statusText;
+    let detail = `Request failed (${res.status} ${res.statusText})`;
     try {
       const data = await res.json();
-      detail = data.detail || detail;
+      detail = extractDetail(data, detail);
     } catch {
-      // ignore json parse errors
+      // response body wasn't JSON; keep the status-based fallback
     }
     throw new Error(detail);
   }
   return res.json();
 }
 
-export async function getProfile() {
-  const res = await fetch(`${BASE_URL}/profile`);
+async function apiFetch(path, options) {
+  let res;
+  try {
+    res = await fetch(`${BASE_URL}${path}`, options);
+  } catch {
+    throw new Error(
+      `Cannot reach the backend at ${BASE_URL}. Make sure the backend server is running.`
+    );
+  }
   return handleResponse(res);
 }
 
+export async function getProfile() {
+  return apiFetch("/profile");
+}
+
 export async function saveProfile(profile) {
-  const res = await fetch(`${BASE_URL}/profile`, {
+  return apiFetch("/profile", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(profile),
   });
-  return handleResponse(res);
 }
 
 export async function getNotesStatus() {
-  const res = await fetch(`${BASE_URL}/notes/status`);
-  return handleResponse(res);
+  return apiFetch("/notes/status");
 }
 
 export async function uploadNotes(file) {
   const formData = new FormData();
   formData.append("file", file);
-  const res = await fetch(`${BASE_URL}/notes`, {
+  return apiFetch("/notes", {
     method: "POST",
     body: formData,
   });
-  return handleResponse(res);
 }
 
 export async function clearNotes() {
-  const res = await fetch(`${BASE_URL}/notes`, { method: "DELETE" });
-  return handleResponse(res);
+  return apiFetch("/notes", { method: "DELETE" });
 }
 
 export async function generateStory() {
-  const res = await fetch(`${BASE_URL}/generate`, { method: "POST" });
-  return handleResponse(res);
+  return apiFetch("/generate", { method: "POST" });
 }

@@ -19,28 +19,66 @@ export default function ProfileForm({ initialProfile, onSaved, onCancel }) {
     (initialProfile?.grammar_focus || []).join(", ")
   );
   const [file, setFile] = useState(null);
+  const [fileError, setFileError] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+
+  function handleFileChange(e) {
+    const selected = e.target.files?.[0] || null;
+    if (selected && !selected.name.toLowerCase().endsWith(".txt")) {
+      setFileError(
+        `"${selected.name}" isn't a .txt file. Please choose a plain text (.txt) file — export or save your notes as .txt first.`
+      );
+      setFile(null);
+      e.target.value = "";
+      return;
+    }
+    setFileError(null);
+    setFile(selected);
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
+
+    if (!level) {
+      setError("Please select a level.");
+      return;
+    }
+
     setSaving(true);
+    let profile;
     try {
-      const profile = await saveProfile({
+      profile = await saveProfile({
         level,
         interests: toList(interests),
         grammar_focus: toList(grammarFocus),
       });
-      if (file) {
-        await uploadNotes(file);
-      }
-      onSaved(profile);
     } catch (err) {
-      setError(err.message || "Something went wrong saving your profile.");
-    } finally {
+      setError(
+        err.message || "Failed to save your profile. Please try again."
+      );
       setSaving(false);
+      return;
     }
+
+    if (file) {
+      try {
+        await uploadNotes(file);
+      } catch (err) {
+        setSaving(false);
+        onSaved(
+          profile,
+          `Your profile was saved, but the notes upload failed: ${
+            err.message || "unknown error"
+          }`
+        );
+        return;
+      }
+    }
+
+    setSaving(false);
+    onSaved(profile);
   }
 
   return (
@@ -104,12 +142,20 @@ export default function ProfileForm({ initialProfile, onSaved, onCancel }) {
         <input
           type="file"
           accept=".txt"
-          onChange={(e) => setFile(e.target.files?.[0] || null)}
+          onChange={handleFileChange}
           className="block w-full text-sm text-gray-700 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
         />
         <p className="text-xs text-gray-500 mt-1">
           Upload your tutor notes or vocabulary lists
         </p>
+        {fileError && (
+          <p className="text-sm text-red-600 mt-1">{fileError}</p>
+        )}
+        {file && !fileError && (
+          <p className="text-sm text-green-600 mt-1">
+            Selected: {file.name}
+          </p>
+        )}
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}

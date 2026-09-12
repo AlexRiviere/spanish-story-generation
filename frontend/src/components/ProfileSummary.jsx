@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { clearNotes } from "../api";
 
-export default function ProfileSummary({ profile, chunkCount, onEdit, onNotesCleared }) {
+export default function ProfileSummary({
+  profile,
+  chunkCount,
+  onEdit,
+  onNotesCleared,
+  warning,
+  onDismissWarning,
+}) {
   const [clearing, setClearing] = useState(false);
   const [error, setError] = useState(null);
 
@@ -12,7 +19,9 @@ export default function ProfileSummary({ profile, chunkCount, onEdit, onNotesCle
       await clearNotes();
       onNotesCleared();
     } catch (err) {
-      setError(err.message || "Failed to clear notes.");
+      setError(
+        err.message || "Failed to clear notes. Please try again."
+      );
     } finally {
       setClearing(false);
     }
@@ -20,6 +29,17 @@ export default function ProfileSummary({ profile, chunkCount, onEdit, onNotesCle
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
+      {warning && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 flex items-start justify-between gap-4">
+          <p className="text-sm text-yellow-800">{warning}</p>
+          <button
+            onClick={onDismissWarning}
+            className="text-sm font-medium text-yellow-800 underline whitespace-nowrap"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="inline-flex items-center px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 text-sm font-semibold">
