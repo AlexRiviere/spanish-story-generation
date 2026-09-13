@@ -29,6 +29,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+MAX_NOTES_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 MB
+
 _openai_client: OpenAI | None = None
 
 
@@ -96,7 +98,15 @@ async def upload_notes(file: UploadFile):
             ),
         )
 
-    raw = await file.read()
+    raw = await file.read(MAX_NOTES_UPLOAD_BYTES + 1)
+    if len(raw) > MAX_NOTES_UPLOAD_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=(
+                f'"{file.filename}" is too large. Please upload a file '
+                f"under {MAX_NOTES_UPLOAD_BYTES // (1024 * 1024)} MB."
+            ),
+        )
     if not raw:
         raise HTTPException(
             status_code=400,
