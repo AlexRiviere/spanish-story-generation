@@ -172,7 +172,7 @@ def generate():
     except Exception as exc:
         raise HTTPException(
             status_code=502,
-            detail=f"Story generation failed unexpectedly: {exc}",
+            detail="Story generation failed unexpectedly",
         )
 
     return result
