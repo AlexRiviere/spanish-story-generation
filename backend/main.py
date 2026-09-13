@@ -1,6 +1,7 @@
 import os
 import random
 
+import anyio
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -131,7 +132,7 @@ async def upload_notes(file: UploadFile):
 
     client = get_openai_client()
     try:
-        added = embeddings.add_notes(client, text)
+        added = await anyio.to_thread.run_sync(embeddings.add_notes, client, text)
     except OpenAIError as exc:
         raise HTTPException(status_code=502, detail=openai_error_detail(exc))
     return {"chunks_added": added, "total_chunks": embeddings.get_chunk_count()}
