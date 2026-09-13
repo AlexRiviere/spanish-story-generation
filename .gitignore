@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Backend data
+backend/data/
+
+# Env
+.env
+CLAUDE.md
+
+# Node
+node_modules/
+frontend/dist/
+frontend/build/
+
+# Editor/OS
+.DS_Store
