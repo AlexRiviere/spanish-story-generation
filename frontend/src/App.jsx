@@ -20,17 +20,23 @@ export default function App() {
     setLoading(true);
     setError(null);
     try {
-      const [profileData, notesData] = await Promise.all([
-        getProfile(),
-        getNotesStatus(),
-      ]);
+      const profileData = await getProfile();
       setProfile(profileData);
-      setChunkCount(notesData.chunk_count);
     } catch (err) {
       setError(err.message || "Failed to load app state.");
-    } finally {
       setLoading(false);
+      return;
     }
+
+    try {
+      const notesData = await getNotesStatus();
+      setChunkCount(notesData.chunk_count);
+    } catch (err) {
+      setNotesWarning("Could not load note status.");
+      setChunkCount(0);
+    }
+
+    setLoading(false);
   }
 
   function handleProfileSaved(savedProfile, warning) {
