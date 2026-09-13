@@ -91,10 +91,11 @@ export default function ProfileForm({ initialProfile, onSaved, onCancel }) {
       </h2>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="level" className="block text-sm font-medium text-gray-700 mb-1">
           Level
         </label>
         <select
+          id="level"
           value={level}
           onChange={(e) => setLevel(e.target.value)}
           className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -108,10 +109,11 @@ export default function ProfileForm({ initialProfile, onSaved, onCancel }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="interests" className="block text-sm font-medium text-gray-700 mb-1">
           Interests
         </label>
         <input
+          id="interests"
           type="text"
           value={interests}
           onChange={(e) => setInterests(e.target.value)}
@@ -122,10 +124,11 @@ export default function ProfileForm({ initialProfile, onSaved, onCancel }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="grammarFocus" className="block text-sm font-medium text-gray-700 mb-1">
           Grammar focus
         </label>
         <input
+          id="grammarFocus"
           type="text"
           value={grammarFocus}
           onChange={(e) => setGrammarFocus(e.target.value)}
@@ -136,10 +139,11 @@ export default function ProfileForm({ initialProfile, onSaved, onCancel }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="notesUpload" className="block text-sm font-medium text-gray-700 mb-1">
           Notes upload
         </label>
         <input
+          id="notesUpload"
           type="file"
           accept=".txt"
           onChange={handleFileChange}
