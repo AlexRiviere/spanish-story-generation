@@ -13,6 +13,9 @@ export default function ProfileSummary({
   const [error, setError] = useState(null);
 
   async function handleClear() {
+    if (!window.confirm("Clear all stored notes? This can't be undone.")) {
+      return;
+    }
     setError(null);
     setClearing(true);
     try {
