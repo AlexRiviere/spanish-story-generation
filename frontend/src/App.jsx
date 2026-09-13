@@ -78,7 +78,7 @@ export default function App() {
           </div>
         )}
 
-        {!loading && (!profile || editing) && (
+        {!loading && !error && (!profile || editing) && (
           <ProfileForm
             initialProfile={editing ? profile : null}
             onSaved={handleProfileSaved}
